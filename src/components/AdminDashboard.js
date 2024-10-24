@@ -153,10 +153,10 @@ const Textarea = ({ id, value, onChange, className = '', ...props }) => (
 // Main Component - AdminDashboard
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("mis-eventos");
-  const [eventos, setEventos] = useState(eventosAdmin);
+  const [eventosAdmin, setEventosAdmin] = useState([]);
+  const [eventos, setEventos] = useState([]);
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [eventosAdmin, setEventosAdmin] = useState([]);
 
   const crearNuevoEvento = (nuevoEvento) => {
     setEventos([...eventos, { ...nuevoEvento, id: eventos.length + 1, inscritos: [] }]);
