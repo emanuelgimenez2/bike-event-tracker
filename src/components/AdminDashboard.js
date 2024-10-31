@@ -1,300 +1,213 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Trophy, Users, Eye } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Search, Download, UserCheck, Users, Calendar, Bike } from 'lucide-react';
 
-// Button Component
-const Button = ({ children, onClick, className = '', variant = 'default', ...props }) => {
-  const baseStyles = 'px-4 py-2 rounded-md text-white transition-colors';
-  const variantStyles = {
-    default: 'bg-blue-600 hover:bg-blue-700',
-    outline: 'border border-blue-600 text-blue-600 hover:bg-blue-100',
-  };
-
-  return (
-    <button 
-      onClick={onClick} 
-      className={`${baseStyles} ${variantStyles[variant]} ${className}`} 
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-// Card Component
-const Card = ({ children, className = '' }) => (
-  <div className={`border rounded-lg shadow p-4 ${className}`}>
-    {children}
-  </div>
-);
-
-const CardHeader = ({ children }) => (
-  <div className="mb-4">
-    {children}
-  </div>
-);
-
-const CardTitle = ({ children, className = '' }) => (
-  <h2 className={`text-xl font-bold ${className}`}>
-    {children}
-  </h2>
-);
-
-const CardContent = ({ children }) => (
-  <div>
-    {children}
-  </div>
-);
-
-// Input Component
-const Input = ({ id, value, onChange, type = 'text', className = '', ...props }) => (
-  <input
-    id={id}
-    value={value}
-    onChange={onChange}
-    type={type}
-    className={`border rounded px-3 py-2 w-full ${className}`}
-    {...props}
-  />
-);
-
-// Label Component
-const Label = ({ htmlFor, children }) => (
-  <label htmlFor={htmlFor} className="font-semibold">
-    {children}
-  </label>
-);
-
-// Tabs Component
-const Tabs = ({ value, onValueChange, children }) => (
-  <div>
-    {children}
-  </div>
-);
-
-const TabsList = ({ children, className = '' }) => (
-  <div className={`flex space-x-4 ${className}`}>
-    {children}
-  </div>
-);
-
-const TabsTrigger = ({ value, children, onClick }) => (
-  <button
-    onClick={() => onClick(value)}
-    className={`px-4 py-2 rounded-md ${value ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-  >
-    {children}
-  </button>
-);
-
-const TabsContent = ({ value, children }) => (
-  <div>
-    {children}
-  </div>
-);
-
-// Table Component
-const Table = ({ children }) => (
-  <table className="min-w-full bg-white">
-    {children}
-  </table>
-);
-
-const TableHead = ({ children }) => (
-  <th className="px-4 py-2 text-left border-b font-semibold">
-    {children}
-  </th>
-);
-
-const TableRow = ({ children }) => (
-  <tr>
-    {children}
-  </tr>
-);
-
-const TableCell = ({ children }) => (
-  <td className="px-4 py-2 border-b">
-    {children}
-  </td>
-);
-
-const TableBody = ({ children }) => (
-  <tbody>
-    {children}
-  </tbody>
-);
-
-// Select Component
-const Select = ({ onValueChange, children }) => (
-  <select
-    onChange={(e) => onValueChange(e.target.value)}
-    className="border rounded px-3 py-2 w-full"
-  >
-    {children}
-  </select>
-);
-
-const SelectItem = ({ value, children }) => (
-  <option value={value}>
-    {children}
-  </option>
-);
-
-// Textarea Component
-const Textarea = ({ id, value, onChange, className = '', ...props }) => (
-  <textarea
-    id={id}
-    value={value}
-    onChange={onChange}
-    className={`border rounded px-3 py-2 w-full ${className}`}
-    {...props}
-  />
-);
-
-// Main Component - AdminDashboard
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("mis-eventos");
-  const [eventosAdmin, setEventosAdmin] = useState([]);
-  const [eventos, setEventos] = useState([]);
-  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  // Estado para los participantes (simulado)
+  const [participants, setParticipants] = useState([
+    {
+      id: 1,
+      nombreCompleto: 'Juan Pérez',
+      email: 'juan@example.com',
+      categoria: 'elite',
+      documento: '12345678',
+      experiencia: 'avanzado',
+      remera: true,
+      talle: 'L',
+      estado: 'confirmado',
+      fechaInscripcion: '2024-10-15'
+    },
+    {
+      id: 2,
+      nombreCompleto: 'María González',
+      email: 'maria@example.com',
+      categoria: 'masterA',
+      documento: '87654321',
+      experiencia: 'intermedio',
+      remera: true,
+      talle: 'M',
+      estado: 'pendiente',
+      fechaInscripcion: '2024-10-16'
+    }
+  ]);
 
-  const crearNuevoEvento = (nuevoEvento) => {
-    setEventos([...eventos, { ...nuevoEvento, id: eventos.length + 1, inscritos: [] }]);
-    setMostrarFormulario(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('todos');
+
+  // Estadísticas generales
+  const stats = {
+    totalInscritos: participants.length,
+    confirmados: participants.filter(p => p.estado === 'confirmado').length,
+    pendientes: participants.filter(p => p.estado === 'pendiente').length,
+    remeras: participants.filter(p => p.remera).length
   };
 
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Panel de Administración</h1>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="mis-eventos" onClick={setActiveTab}>Mis Eventos</TabsTrigger>
-          <TabsTrigger value="crear-evento" onClick={setActiveTab}>Crear Evento</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="mis-eventos">
-          <div className="space-y-4">
-            {eventos.map(evento => (
-              <EventoAdminCard 
-                key={evento.id} 
-                evento={evento}
-                onVerDetalles={() => setEventoSeleccionado(evento)}
-              />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="crear-evento">
-          <CrearEventoForm onCrearEvento={crearNuevoEvento} />
-        </TabsContent>
-      </Tabs>
-
-      {/* {eventoSeleccionado && (
-        <DetallesEvento 
-          evento={eventoSeleccionado} 
-          onCerrar={() => setEventoSeleccionado(null)}
-        />
-      )} */}
-    </div>
-  );
-};
-
-const EventoAdminCard = ({ evento, onVerDetalles }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex justify-between items-center">
-        <span>{evento.titulo}</span>
-        <Button onClick={onVerDetalles}>
-          <Eye className="mr-2 h-4 w-4" /> Ver Detalles
-        </Button>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="flex items-center">
-          <Calendar className="mr-2 h-4 w-4" />
-          <span>{evento.fecha}</span>
-        </div>
-        <div className="flex items-center">
-          <Users className="mr-2 h-4 w-4" />
-          <span>{evento.inscritos.length} / {evento.capacidad}</span>
-        </div>
-        <div className="flex items-center">
-          <MapPin className="mr-2 h-4 w-4" />
-          <span>{evento.ubicacion}</span>
-        </div>
-        <div className="flex items-center">
-          <Trophy className="mr-2 h-4 w-4" />
-          <span>{evento.dificultad}</span>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const CrearEventoForm = ({ onCrearEvento }) => {
-  const [formData, setFormData] = useState({
-    titulo: '',
-    fecha: '',
-    ubicacion: '',
-    distancia: '',
-    dificultad: '',
-    precio: '',
-    capacidad: '',
-    descripcion: '',
-    categorias: ['Elite', 'Master A', 'Master B', 'Recreativa']
+  // Filtrar participantes
+  const filteredParticipants = participants.filter(participant => {
+    const matchesSearch = participant.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         participant.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === 'todos' || participant.categoria === filterCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCrearEvento(formData);
+  // Cambiar estado de inscripción
+  const handleStatusChange = (id) => {
+    setParticipants(participants.map(participant => {
+      if (participant.id === id) {
+        const newStatus = participant.estado === 'confirmado' ? 'pendiente' : 'confirmado';
+        return { ...participant, estado: newStatus };
+      }
+      return participant;
+    }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="titulo">Título del Evento</Label>
-          <Input
-            id="titulo"
-            value={formData.titulo}
-            onChange={(e) => setFormData({...formData, titulo: e.target.value})}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fecha">Fecha</Label>
-          <Input
-            id="fecha"
-            type="date"
-            value={formData.fecha}
-            onChange={(e) => setFormData({...formData, fecha: e.target.value})}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="ubicacion">Ubicación</Label>
-          <Input
-            id="ubicacion"
-            value={formData.ubicacion}
-            onChange={(e) => setFormData({...formData, ubicacion: e.target.value})}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="distancia">Distancia</Label>
-          <Input
-            id="distancia"
-            value={formData.distancia}
-            onChange={(e) => setFormData({...formData, distancia: e.target.value})}
-            required
-          />
-        </div>
+    <div className="p-6 space-y-6">
+      {/* Header con título y botones principales */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold"> Administración</h1>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Download className="w-4 h-4" />
+          Exportar Datos
+        </Button>
       </div>
-      {/* Add more inputs for capacidad, dificultad, etc. */}
-      <Button type="submit">Crear Evento</Button>
-    </form>
+
+      {/* Tarjetas de estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Inscritos</p>
+                <p className="text-2xl font-bold">{stats.totalInscritos}</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Confirmados</p>
+                <p className="text-2xl font-bold">{stats.confirmados}</p>
+              </div>
+              <UserCheck className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Pendientes</p>
+                <p className="text-2xl font-bold">{stats.pendientes}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Remeras Solicitadas</p>
+                <p className="text-2xl font-bold">{stats.remeras}</p>
+              </div>
+              <Bike className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filtros y búsqueda */}
+      <Card className="bg-white">
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar participante..."
+                  className="pl-10 p-2 w-full border rounded-md"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <select
+              className="p-2 border rounded-md"
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              <option value="todos">Todas las categorías</option>
+              <option value="elite">Elite</option>
+              <option value="masterA">Master A</option>
+              <option value="masterB">Master B</option>
+              <option value="recreativa">Recreativa</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tabla de participantes */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle>Lista de Participantes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-3">Nombre</th>
+                  <th className="text-left p-3">Email</th>
+                  <th className="text-left p-3">Categoría</th>
+                  <th className="text-left p-3">Experiencia</th>
+                  <th className="text-left p-3">Talle Remera</th>
+                  <th className="text-left p-3">Estado</th>
+                  <th className="text-left p-3">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredParticipants.map((participant) => (
+                  <tr key={participant.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3">{participant.nombreCompleto}</td>
+                    <td className="p-3">{participant.email}</td>
+                    <td className="p-3 capitalize">{participant.categoria}</td>
+                    <td className="p-3 capitalize">{participant.experiencia}</td>
+                    <td className="p-3">{participant.remera ? participant.talle : 'N/A'}</td>
+                    <td className="p-3">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        participant.estado === 'confirmado' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {participant.estado}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStatusChange(participant.id)}
+                      >
+                        {participant.estado === 'confirmado' ? 'Desconfirmar' : 'Confirmar'}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

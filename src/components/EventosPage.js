@@ -2,36 +2,38 @@ import React, { useState } from 'react';
 import { Button } from "../components/ui/Button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/Card";
 import { Calendar, MapPin, Trophy, Users, Clock, Bike } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer,  Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import FormularioInscripcion from './FormularioInscripcion';
 
-// Lista de eventos con un recorrido
 const eventos = [
   {
     id: 1,
     titulo: "Gran Fondo Mountain Bike 2024",
     fecha: "15 de Julio, 2024",
-    ubicacion: "Sierra Nevada",
+    ubicacion: "Concepcion del Uruguay",
     distancia: "50km",
     dificultad: "Intermedia",
     precio: "$50.00",
     capacidad: "200 ciclistas",
     descripcion: "Una emocionante carrera de mountain bike a través de los senderos más desafiantes de Sierra Nevada. Ideal para ciclistas que buscan poner a prueba sus habilidades en terreno montañoso.",
-    categorias: ["Elite", "Master A", "Master B", "Recreativa"],
-    coordenadas: { lat:-32.4833, lng:  -58.2333 },
-    // Ejemplo de coordenadas para un recorrido en la Sierra Nevada
+    categorias: ["Elite", "Recreativa"],
+    coordenadas: { lat:-32.4833, lng: -58.2333 },
     recorrido: [
       [-32.48824892550995, -58.260863756547764],
-      [-32.48651134891571, -58.309701414814995],
-      [37.0950, -3.4200],
-      [37.1000, -3.4300],
-      [37.1050, -3.4400]
+      [-32.467924, -58.263902],
+      [-32.464680, -58.255122],
+      [-32.465241, -58.252376],
+      [-32.464734, -58.246099],
+      [-32.465404, -58.244737],
+      [-32.466861, -58.243986],
+      [-32.471270, -58.238053],
+      [-32.472953, -58.236401],
+      [-32.464734, -58.246099],
     ]
   },
-  // Puedes añadir más eventos con sus respectivos recorridos aquí
 ];
 
-// Componente del mapa con el recorrido
 const MapaRecorrido = ({ coordenadas, recorrido }) => {
   return (
     <MapContainer center={[coordenadas.lat, coordenadas.lng]} zoom={13} className="h-64 rounded-md mt-4">
@@ -39,28 +41,16 @@ const MapaRecorrido = ({ coordenadas, recorrido }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      
-      {/* Marcador de la ubicación del evento */}
-      <Marker position={[coordenadas.lat, coordenadas.lng]}>
-        <Popup>
-          Ubicación del evento: {coordenadas.lat}, {coordenadas.lng}
-        </Popup>
-      </Marker>
-      
-      {/* Polyline para mostrar el recorrido */}
       <Polyline
         positions={recorrido}
-        color="blue" // Color azul para el recorrido
-        weight={4} // Grosor de la línea
+        color="blue"
+        weight={4}
       />
     </MapContainer>
   );
 };
 
-// Componente principal de la tarjeta del evento
-const EventoCard = ({ evento }) => {
-  const [showForm, setShowForm] = useState(false);
-
+const EventoCard = ({ evento, onInscribirse }) => {
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -103,124 +93,66 @@ const EventoCard = ({ evento }) => {
               <p>{evento.categorias.join(", ")}</p>
             </div>
           </div>
-          
-          {/* Mapa del recorrido */}
           <MapaRecorrido coordenadas={evento.coordenadas} recorrido={evento.recorrido} />
         </div>
       </CardContent>
       <CardFooter className="flex justify-between items-center">
         <div className="text-xl font-bold">{evento.precio}</div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cerrar formulario' : 'Inscribirse'}
+        <Button onClick={onInscribirse}>
+          Inscribirse
         </Button>
       </CardFooter>
-
-      {showForm && (
-        <CardContent>
-          <FormularioInscripcion evento={evento} />
-        </CardContent>
-      )}
     </Card>
   );
 };
 
-// Formulario de inscripción
-const FormularioInscripcion = ({ evento }) => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    telefono: '',
-    categoria: '',
-    documento: '',
-    comprobante: null
-  });
+const EventosPage = () => {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedEvento, setSelectedEvento] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Formulario enviado:', formData);
-    alert('Inscripción enviada con éxito');
+  const handleInscribirse = (evento) => {
+    setSelectedEvento(evento);
+    setShowForm(true);
+  };
+
+  const handleVolverEventos = () => {
+    setShowForm(false);
+    setSelectedEvento(null);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-      <h3 className="text-lg font-semibold mb-4">Formulario de Inscripción - {evento.titulo}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Nombre Completo</label>
-          <input 
-            type="text" 
-            className="w-full p-2 border rounded" 
-            required
-            onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input 
-            type="email" 
-            className="w-full p-2 border rounded"
-            required
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Teléfono</label>
-          <input 
-            type="tel" 
-            className="w-full p-2 border rounded"
-            required
-            onChange={(e) => setFormData({...formData, telefono: e.target.value})}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Documento de Identidad</label>
-          <input 
-            type="text" 
-            className="w-full p-2 border rounded"
-            required
-            onChange={(e) => setFormData({...formData, documento: e.target.value})}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Categoría</label>
-          <select 
-            className="w-full p-2 border rounded"
-            required
-            onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-          >
-            <option value="">Seleccione una categoría</option>
-            {evento.categorias.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Comprobante de Pago</label>
-          <input 
-            type="file" 
-            className="w-full p-2 border rounded"
-            required
-            onChange={(e) => setFormData({...formData, comprobante: e.target.files[0]})}
-          />
-        </div>
-      </div>
-      <Button type="submit" className="w-full mt-6">
-        Enviar Inscripción
-      </Button>
-    </form>
-  );
-};
-
-// Página de eventos
-const EventosPage = () => {
-  return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Eventos Disponibles</h1>
-      <div className="space-y-6">
-        {eventos.map(evento => (
-          <EventoCard key={evento.id} evento={evento} />
-        ))}
-      </div>
+      {!showForm ? (
+        <>
+          <h1 className="text-3xl font-bold mb-6">Eventos Disponibles</h1>
+          <div className="space-y-6">
+            {eventos.map(evento => (
+              <EventoCard 
+                key={evento.id} 
+                evento={evento} 
+                onInscribirse={() => handleInscribirse(evento)}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+          
+            <Button 
+              variant="outline"
+              onClick={handleVolverEventos}
+            >
+              Volver a Eventos
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <FormularioInscripcion evento={selectedEvento} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
